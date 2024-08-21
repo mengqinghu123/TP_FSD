@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'documents.css' %}">
+    <link rel="stylesheet" href="{% static 'styles.css' %}"> <!-- Link to your external CSS -->
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{% static 'pic/logo.png' %}" alt="Logo">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="{% url 'index' %}">HOME</a></li>
+                <li><a href="#about">ABOUT FSD</a></li>
+                <li><a href="#contact">CONTACT</a></li>
+                <li><a href="#knowledge">KNOWLEDGE</a></li>
+                <li><a href="#dataprotection">DATA PROTECTION</a></li>
+
+                {% if is_admin %}
+                <li><a href="{% url 'document_management' %}">DOCUMENT MANAGEMENT</a></li>
+                {% endif %}
+
+                <li class="language"><a href="#"><img src="{% static 'pic/flagg_de.png' %}" alt="German"></a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="container">
+            <!-- Upload Form -->
+            <form id="uploadForm" method="POST" enctype="multipart/form-data" action="{% url 'upload_file' %}">
+                {% csrf_token %}
+                <input type="file" id="fileUpload" name="fileUpload" required>
+                <button type="submit">Upload</button>
+            </form>
+
+            <!-- File Table -->
+            <table id="fileTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>NAME</th>
+                        <th>DATE</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for file in files %}
+                    <tr>
+                        <td>{{ forloop.counter0|add:files.start_index }}</td>
+                        <td>{{ file.name }}</td>
+                        <td>{{ file.uploaded_at|date:"Y-m-d" }}</td>
+                        <td class="actions-column">
+                            <a href="{% url 'view_file' file.id %}" class="view-btn">VIEW</a>
+                            <a href="{% url 'download_file' file.id %}" class="download-btn">DOWNLOAD</a>
+                            <form action="{% url 'delete_file' file.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="delete-btn">DELETE</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Pagination Controls -->
+            <div class="pagination">
+                {% if files.has_previous %}
+                <a href="?page={{ files.previous_page_number }}">Previous</a>
+                {% endif %}
+
+                <span>Page {{ files.number }} of {{ files.paginator.num_pages }}</span>
+
+                {% if files.has_next %}
+                <a href="?page={{ files.next_page_number }}">Next</a>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 File Upload System. All rights reserved.</p>
+    </footer>
+
+    <script src="{% static 'scripts.js' %}"></script>
+</body>
+</html>
