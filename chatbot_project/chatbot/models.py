@@ -3,6 +3,7 @@ from django.db import models
 import uuid
 from django.utils import timezone
 
+#ceshi
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
